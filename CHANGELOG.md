@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Added
+
+- `crap.count_constructors` (default `false`): score constructors that
+  have a body as methods, named `<Class>.<name>` (`<Class>.new` for the
+  unnamed constructor). Constructors were unconditionally skipped, which
+  hides factory constructors doing validation, JSON normalization or
+  mapping work — a common shape in freezed/Flutter model layers, where
+  the branching lives in the factory rather than in a method. Bodyless
+  and redirecting constructors (`factory Foo() = _Foo;`) stay skipped.
+  Off by default: enabling it adds rows to the report and can raise the
+  max CRAP of an existing project.
+
 ### Fixed
 
 - Cyclomatic complexity: `switch` **expression** arms were not counted.
@@ -21,6 +33,7 @@ All notable changes to this project will be documented in this file.
   gate id to its `enabled`/`ignorable`/`severity` flag are now lookup
   tables. With the complexity fix above they were CC 23 each (over the
   project's own limit of 12) and drove `GateRunner`'s WMC to 109.
+||||||| b789739
 
 ## 0.9.5
 
