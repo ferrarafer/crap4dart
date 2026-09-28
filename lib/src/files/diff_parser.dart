@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import 'git_process.dart';
+
 /// Added/changed lines of the new file versions in a git diff.
 ///
 /// Keys are project-relative paths of new file versions; values are the
@@ -61,8 +63,7 @@ class GitDiffParser {
   /// Throws a [ProcessException] when git fails (e.g. not a git
   /// repository or an unknown ref).
   Future<DiffLineMap> diff(String projectRoot, {String base = 'HEAD'}) async {
-    final result = await Process.run(
-      'git',
+    final result = await runGit(
       ['diff', '--relative', '--unified=0', base, '--', '*.dart'],
       workingDirectory: projectRoot,
     );

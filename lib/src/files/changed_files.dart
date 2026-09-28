@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'git_process.dart';
+
 /// Discovers changed Dart files from the git working tree.
 class ChangedFilesFinder {
   /// Creates a [ChangedFilesFinder].
@@ -11,8 +13,7 @@ class ChangedFilesFinder {
   /// When [staged] is true, only staged changes are considered
   /// (`git diff --cached`); otherwise `git status --porcelain` is used.
   Future<List<String>> find(String rootDir, {bool staged = false}) async {
-    final result = await Process.run(
-      'git',
+    final result = await runGit(
       staged
           ? const ['diff', '--cached', '--name-only', '--diff-filter=ACM']
           : const ['status', '--porcelain'],

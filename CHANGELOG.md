@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.12.2
+
+### Fixed
+
+- `--staged` / `--changed` / `--diff` crashed or resolved wrong paths
+  when run from a git hook in a sub-package (e.g. `cd app && crap4dart
+  check --staged` in a monorepo pre-commit hook): git exports `GIT_DIR`
+  to hooks, which makes git treat the current directory as the work-tree
+  root, so repository paths were joined twice (`app/app/lib/...`). All
+  git calls now drop `GIT_DIR` / `GIT_WORK_TREE` (keeping
+  `GIT_INDEX_FILE`) and discover the repository from the project root.
+
 ## 0.12.1
 
 ### Fixed

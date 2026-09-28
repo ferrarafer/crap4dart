@@ -12,6 +12,7 @@ import '../crap/crap_analyzer.dart';
 import '../crap/crap_report.dart';
 import '../files/changed_files.dart';
 import '../files/diff_parser.dart';
+import '../files/git_process.dart';
 import '../files/source_finder.dart';
 import '../gates/baseline.dart';
 import '../gates/gate_context.dart';
@@ -35,8 +36,7 @@ String canonicalPath(String path) => Directory(path).resolveSymbolicLinksSync();
 /// report paths relative to this root (not to the current directory), so
 /// monorepo sub-package runs must join staged/changed paths against it.
 Future<String> gitTopLevel(String dir) async {
-  final result = await Process.run(
-    'git',
+  final result = await runGit(
     const ['rev-parse', '--show-toplevel'],
     workingDirectory: dir,
   );
@@ -52,7 +52,7 @@ Future<String> gitTopLevel(String dir) async {
 }
 
 /// Current crap4dart version.
-const String crap4dartVersion = '0.12.1';
+const String crap4dartVersion = '0.12.2';
 
 /// Shared CLI flag names used by multiple commands.
 const String _configFlag = 'config';
