@@ -125,16 +125,17 @@ int writeBaseline(String projectRoot, List<GateResult> results) {
 }
 
 /// Strips baseline-covered violations from [result]; a gate with every
-/// violation covered passes.
+/// violation covered passes. Applies to `severity: warning` gates too
+/// (their results count as passed but still carry violations).
 GateResult applyBaseline(String gateId, GateResult result, Baseline baseline) {
-  if (result.passed || result.violations.isEmpty) return result;
+  if (result.violations.isEmpty) return result;
   final fresh = baseline.uncovered(gateId, result.violations);
   if (fresh.length == result.violations.length) return result;
   return GateResult(
     gateId: gateId,
-    passed: fresh.isEmpty,
+    passed: result.passed || fresh.isEmpty,
     violations: fresh,
     summary: result.summary,
-    warning: result.warning,
+    warning: result.warning && fresh.isNotEmpty,
   );
 }

@@ -69,4 +69,17 @@ void main() {
         'complexity', GateResult.fail('complexity', [_loc(900)]), baseline);
     expect(other.passed, isFalse);
   });
+
+  test('applies to severity: warning gates', () {
+    final baseline = saved([_loc(900)]);
+    final covered =
+        applyBaseline('loc', GateResult.warn('loc', [_loc(900)]), baseline);
+    expect(covered.warning, isFalse);
+    expect(covered.violations, isEmpty);
+    final grown = _loc(950);
+    final still =
+        applyBaseline('loc', GateResult.warn('loc', [grown]), baseline);
+    expect(still.warning, isTrue);
+    expect(still.passed, isTrue);
+  });
 }

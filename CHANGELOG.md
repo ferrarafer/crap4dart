@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.10.1
+
+### Fixed
+
+- `check --baseline` ignored `severity: warning` gates: their results
+  count as passed, and the baseline only filtered failed gates, so every
+  baselined violation was still reported as a warning.
+
 ## 0.10.0
 
 Fork release (ferrarafer/crap4dart). Minor bump: `.crap-baseline.json`
