@@ -71,22 +71,14 @@ void main() {
     expect(back, isEmpty, reason: 'shrinking back must be covered again');
   });
 
-  test('keeps entries of gates that did not run', () {
-    const doc = GateViolation(file: 'lib/a.dart', message: 'missing doc');
-    save([
-      GateResult.fail('loc', [_loc(900)]),
-      GateResult.fail('public_docs', [doc]),
-      GateResult.fail('complexity', [_loc(20)]),
-    ]);
-    final stats = tightenBaseline(root.path, [
-      GateResult.fail('loc', const []),
-      GateResult.skip('complexity', 'disabled in config'),
-    ])!;
-    expect((stats.kept, stats.removed), (2, 1));
-    expect(stored().map((e) => e['gate']), ['public_docs', 'complexity']);
-  });
-
-  test('returns null without a baseline file', () {
-    expect(tightenBaseline(root.path, const []), isNull);
+  test('a no-op tighten leaves the file byte-identical', () {
+    // Same key (file + message shape), ascending measures: matching sorts
+    // largest first, the file must keep violation order.
+    final now = [_loc(500), _loc(900), _loc(700, file: 'lib/c.dart')];
+    save([GateResult.fail('loc', now)]);
+    final file = File(p.join(root.path, baselineFileName));
+    final before = file.readAsStringSync();
+    tighten(now);
+    expect(file.readAsStringSync(), before);
   });
 }

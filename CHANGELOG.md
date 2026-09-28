@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.12.1
+
+### Fixed
+
+- `check --tighten-baseline` rewrote entries in matching order, so a
+  run that changed nothing still reordered `.crap-baseline.json` (noisy
+  diffs). It now keeps the `--save-baseline` order; a no-op tighten
+  leaves the file byte-identical.
+
 ## 0.12.0
 
 ### Added

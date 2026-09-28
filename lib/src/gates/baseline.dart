@@ -150,12 +150,21 @@ int writeBaseline(String projectRoot, List<GateResult> results) {
   return violations.length;
 }
 
-Map<String, Object?> _entry(String gateId, GateViolation violation) => {
-      'gate': gateId,
-      'file': violation.file,
-      'message': violation.message,
-      if (violation.measure != null) 'measure': violation.measure,
-    };
+/// The stored form of [violation]; [ceiling] overrides its measure
+/// (`double.infinity` means none).
+Map<String, Object?> _entry(
+  String gateId,
+  GateViolation violation, {
+  num? ceiling,
+}) {
+  final measure = ceiling ?? violation.measure;
+  return {
+    'gate': gateId,
+    'file': violation.file,
+    'message': violation.message,
+    if (measure != null && measure != double.infinity) 'measure': measure,
+  };
+}
 
 void _writeEntries(String projectRoot, List<Map<String, Object?>> entries) {
   File(p.join(projectRoot, baselineFileName)).writeAsStringSync(
@@ -204,6 +213,7 @@ TightenStats? tightenBaseline(String projectRoot, List<GateResult> results) {
     for (final r in results)
       if (!r.skipped) r.gateId,
   };
+  // Entries of gates that did not run are kept as they are.
   final entries = <Map<String, Object?>>[
     for (final entry in stored)
       if (!ran.contains(entry['gate'])) entry,
@@ -213,18 +223,19 @@ TightenStats? tightenBaseline(String projectRoot, List<GateResult> results) {
   for (final result in results.where((r) => !r.skipped)) {
     final pairs = baseline.pairUp(result.gateId, result.violations);
     notAdded += result.violations.length - pairs.matched.length;
-    pairs.matched.forEach((violation, ceiling) {
-      if ((violation.measure ?? ceiling) < ceiling) lowered++;
-      entries.add(_entry(result.gateId, violation));
-    });
-    // A grown violation still exists: keep its old ceiling so fixing it
-    // back down is covered again (it keeps failing meanwhile).
-    pairs.grown.forEach((violation, ceiling) {
-      entries.add({
-        ..._entry(result.gateId, violation),
-        'measure': ceiling == double.infinity ? null : ceiling,
-      }..removeWhere((key, value) => value == null));
-    });
+    // Violation order (as --save-baseline writes it): a no-op tighten
+    // leaves the file unchanged.
+    for (final violation in result.violations) {
+      final ceiling = pairs.matched[violation];
+      if (ceiling != null) {
+        if ((violation.measure ?? ceiling) < ceiling) lowered++;
+        entries.add(_entry(result.gateId, violation));
+      } else if (pairs.grown[violation] case final old?) {
+        // A grown violation still exists: keep its old ceiling so fixing
+        // it back down is covered again (it keeps failing meanwhile).
+        entries.add(_entry(result.gateId, violation, ceiling: old));
+      }
+    }
   }
   _writeEntries(projectRoot, entries);
   return TightenStats(
