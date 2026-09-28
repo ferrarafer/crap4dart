@@ -96,6 +96,7 @@ class CoverageConfig {
     this.runTests = true,
     this.required = true,
     this.branchCoverage = true,
+    this.unloadedAsUncovered = true,
   });
 
   /// Path to the LCOV coverage file, relative to the project root.
@@ -111,6 +112,11 @@ class CoverageConfig {
 
   /// Whether branch coverage is reported in addition to line coverage.
   final bool branchCoverage;
+
+  /// Whether a source file missing from the LCOV report, under a
+  /// top-level directory the report covers, counts as 0% covered instead
+  /// of N/A (no test loaded it). Default true.
+  final bool unloadedAsUncovered;
 }
 
 /// Settings of all quality gates.

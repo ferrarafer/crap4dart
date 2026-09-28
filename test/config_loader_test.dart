@@ -52,6 +52,13 @@ gates:
       expect(config.gates.loc.maxLines, 800);
     });
 
+    test('coverage.unloaded_as_uncovered defaults to true and parses', () {
+      expect(loader.loadString('').coverage.unloadedAsUncovered, isTrue);
+      final off =
+          loader.loadString('coverage:\n  unloaded_as_uncovered: false\n');
+      expect(off.coverage.unloadedAsUncovered, isFalse);
+    });
+
     test('empty document yields defaults', () {
       expect(loader.loadString('').crap.threshold, 8.0);
     });

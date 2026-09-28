@@ -253,6 +253,14 @@ hits > 0 the numerator. Branch coverage shall analogously use `BRDA`
 records taken at least once. When no records fall inside a method's
 range, coverage shall be N/A.
 
+A source file with no LCOV entry at all was never loaded by a test. When
+`coverage.unloaded_as_uncovered` is true (default) and the file lies
+under a top-level directory that has at least one LCOV entry (e.g.
+`lib/`), its methods shall have line coverage `0.0` (branch coverage
+N/A) and a numeric CRAP score. Files under top-level directories the
+report does not cover (e.g. `test/` when coverage reports on `lib/`),
+and every file when no coverage data exists, stay N/A.
+
 LCOV entries whose path is not project-relative (absolute, or escaping
 the root via `..`) shall be ignored during attribution, so dependency
 records (e.g. from the pub cache) are never matched to project files.

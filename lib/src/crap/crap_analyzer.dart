@@ -49,14 +49,24 @@ class CrapAnalyzer {
   /// [countLambdas] controls whether lambda branches count towards the
   /// enclosing method's complexity. [countConstructors] controls whether
   /// constructors with a body are scored as methods.
+  ///
+  /// When [unloadedAsUncovered] is true, a file with no LCOV entry that
+  /// lives under a top-level directory the report covers (e.g. `lib/`
+  /// while other `lib/` files have entries) is scored as 0% covered: no
+  /// test loaded it, so none of its code ran. Files under directories the
+  /// report does not cover at all (e.g. `test/`) stay N/A.
   List<MethodMetrics> analyze(
     List<String> filePaths, {
     String? lcovPath,
     String? projectRoot,
     bool countLambdas = true,
     bool countConstructors = false,
+    bool unloadedAsUncovered = false,
   }) {
     final coverageByFile = _loadCoverage(lcovPath, projectRoot);
+    final coveredRoots = unloadedAsUncovered
+        ? {for (final path in coverageByFile.keys) p.split(path).first}
+        : const <String>{};
     final parser = DartParser();
     final extractor = MethodExtractor(countConstructors: countConstructors);
     final complexityCalculator =
@@ -73,12 +83,16 @@ class CrapAnalyzer {
         filePath: filePath,
       );
       final fileCoverage = _coverageFor(coverageByFile, filePath, projectRoot);
+      final unloaded = fileCoverage == null &&
+          _inCoveredRoot(filePath, projectRoot, coveredRoots);
       for (final extracted in methods) {
         final method = extracted.info;
         final complexity = complexityCalculator.compute(extracted.node);
-        final coverage = fileCoverage == null
-            ? null
-            : coverageCalculator.lineCoverage(method, fileCoverage);
+        final coverage = unloaded
+            ? 0.0
+            : fileCoverage == null
+                ? null
+                : coverageCalculator.lineCoverage(method, fileCoverage);
         final branchCoverage = fileCoverage == null
             ? null
             : coverageCalculator.branchCoverage(method, fileCoverage);
@@ -108,6 +122,20 @@ class CrapAnalyzer {
         // cache): they must never be attributed to project files.
         if (_isProjectRelative(f.path)) f.path: f,
     };
+  }
+
+  bool _inCoveredRoot(
+    String filePath,
+    String? projectRoot,
+    Set<String> coveredRoots,
+  ) {
+    if (coveredRoots.isEmpty) return false;
+    final root = projectRoot ?? Directory.current.path;
+    final relative = p.isAbsolute(filePath)
+        ? p.relative(filePath, from: root)
+        : p.normalize(filePath);
+    return _isProjectRelative(relative) &&
+        coveredRoots.contains(p.split(relative).first);
   }
 
   bool _isProjectRelative(String path) =>

@@ -182,7 +182,13 @@ class ConfigLoader {
     final map = _ConfigScalars.asMap(node, path, _coverageKey);
     _ConfigScalars.checkKeys(
       map,
-      const {'lcov_path', _runTestsKey, 'required', 'branch_coverage'},
+      const {
+        'lcov_path',
+        _runTestsKey,
+        'required',
+        'branch_coverage',
+        'unloaded_as_uncovered',
+      },
       path,
       _coverageKey,
     );
@@ -195,6 +201,8 @@ class ConfigLoader {
           map, 'required', base.required, path, _coverageKey),
       branchCoverage: _ConfigScalars.readBool(
           map, 'branch_coverage', base.branchCoverage, path, _coverageKey),
+      unloadedAsUncovered: _ConfigScalars.readBool(map, 'unloaded_as_uncovered',
+          base.unloadedAsUncovered, path, _coverageKey),
     );
   }
 

@@ -243,6 +243,10 @@ coverage:
   required: true
   # Report branch coverage (BRDA records) in addition to line coverage.
   branch_coverage: true
+  # Score files missing from the LCOV report as 0% covered (no test
+  # loaded them) when they sit under a directory the report covers
+  # (e.g. lib/); files under uncovered directories (test/) stay N/A.
+  unloaded_as_uncovered: true
 
 # Quality gates ("check" command).
 gates:

@@ -51,7 +51,7 @@ Future<String> gitTopLevel(String dir) async {
 }
 
 /// Current crap4dart version.
-const String crap4dartVersion = '0.10.2';
+const String crap4dartVersion = '0.11.0';
 
 /// Shared CLI flag names used by multiple commands.
 const String _configFlag = 'config';
@@ -448,6 +448,7 @@ class AnalyzeCommand extends Command<int> with CommandHelpers {
       projectRoot: projectRoot,
       countLambdas: config.crap.countLambdas,
       countConstructors: config.crap.countConstructors,
+      unloadedAsUncovered: config.coverage.unloadedAsUncovered,
     );
     if (diffMap == null) return metrics;
     return [

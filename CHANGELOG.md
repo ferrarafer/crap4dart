@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.11.0
+
+### Changed
+
+- `analyze`: a source file missing from the LCOV report (no test loaded
+  it) is now scored as 0% covered instead of N/A when it lives under a
+  top-level directory the report covers (e.g. `lib/`). Previously a
+  brand-new, completely untested file had CRAP N/A and never exceeded
+  the threshold — the worst code was invisible. Files under directories
+  the report does not cover (e.g. `test/`) stay N/A. Opt out with
+  `coverage.unloaded_as_uncovered: false`.
+
 ## 0.10.2
 
 ### Fixed
