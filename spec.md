@@ -221,9 +221,11 @@ project root.
 
 ### 6.2 Test Execution
 
-When `coverage.run_tests` (or `crap.run_tests`) is true in the config, or
-`--run-tests` is given, the tool shall run the test suite before reading
-coverage:
+When `coverage.run_tests` (default `true`) or `crap.run_tests` (default
+`false`) is true in the config, or `--run-tests` is given, the tool shall
+run the test suite before reading coverage. An explicit `analyze --lcov`
+path suppresses the config-driven run (the given file is read as-is);
+`--run-tests` still forces one:
 
 - Flutter projects (pubspec depends on `flutter`):
   `flutter test --coverage`

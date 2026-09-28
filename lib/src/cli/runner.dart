@@ -345,7 +345,8 @@ class AnalyzeCommand extends Command<int> with CommandHelpers {
       )
       ..addOption(
         _lcovFlag,
-        help: 'Path to an LCOV coverage file (overrides the config value).',
+        help: 'Path to an LCOV coverage file (overrides the config value; '
+            'skips the automatic test run unless --run-tests is given).',
       )
       ..addFlag(
         _runTestsFlag,
@@ -513,10 +514,13 @@ class AnalyzeCommand extends Command<int> with CommandHelpers {
   }
 
   Future<String?> _resolveLcov(String projectRoot, Crap4DartConfig config) {
+    final explicitLcov = argResults!.wasParsed(_lcovFlag);
+    // An explicit --lcov file is the coverage to use: the config's
+    // run_tests (default true) must not replace it with a fresh run.
+    // Only --run-tests still forces one.
     final runTests = (argResults![_runTestsFlag] as bool) ||
-        config.crap.runTests ||
-        config.coverage.runTests;
-    final lcovPath = argResults!.wasParsed(_lcovFlag)
+        (!explicitLcov && (config.crap.runTests || config.coverage.runTests));
+    final lcovPath = explicitLcov
         ? argResults![_lcovFlag] as String
         : config.coverage.lcovPath;
     return _resolveLcovPath(projectRoot, runTests, lcovPath);

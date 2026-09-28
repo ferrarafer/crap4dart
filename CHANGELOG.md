@@ -22,6 +22,13 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `analyze --lcov <file>` no longer re-runs the test suite first.
+  Because `coverage.run_tests` defaults to `true`, an explicit coverage
+  file was silently replaced by a fresh (possibly very long) test run.
+  An explicit `--lcov` now skips the config-driven run; `--run-tests`
+  still forces one.
+- `init` template and README showed `coverage.run_tests: false`,
+  contradicting the actual default (`true` since 0.9.0).
 - Cyclomatic complexity: `switch` **expression** arms were not counted.
   Only `SwitchCase`/`SwitchPatternCase`/`SwitchDefault` (statement form)
   incremented complexity, so a Dart 3 `switch` expression scored CC 1

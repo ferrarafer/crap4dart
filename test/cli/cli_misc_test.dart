@@ -34,6 +34,19 @@ void main() {
       expect(result.stdout, contains('Max CRAP: 3.00'));
     });
 
+    test('analyze --lcov skips the default run_tests test run', () async {
+      writeMiniProject(tempDir, lcov: zeroCoverageLcov);
+      // No config: coverage.run_tests takes its default (true).
+      File(p.join(tempDir.path, 'crap4dart.yaml')).deleteSync();
+      final lcov = p.join(tempDir.path, 'custom.info');
+      File(lcov).writeAsStringSync(fullCoverageLcov);
+      final result =
+          await runCliInProcess(tempDir, ['analyze', '--lcov', lcov]);
+      expect(result.exitCode, 0);
+      expect(result.stderr, isNot(contains('Running "')));
+      expect(result.stdout, contains('Max CRAP: 3.00'));
+    });
+
     test('check reports test_coverage when lcov exists', () async {
       writeMiniProject(tempDir, lcov: fullCoverageLcov);
       File(p.join(tempDir.path, 'crap4dart.yaml')).writeAsStringSync('''

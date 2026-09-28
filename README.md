@@ -236,8 +236,9 @@ crap:
 coverage:
   # Path to the LCOV coverage file, relative to the project root.
   lcov_path: coverage/lcov.info
-  # Run "dart test --coverage" / "flutter test --coverage" before analyzing.
-  run_tests: false
+  # Run "dart test --coverage" / "flutter test --coverage" before analyzing
+  # (default true; "analyze --lcov <file>" skips the run and uses that file).
+  run_tests: true
   # Fail when no coverage data is available instead of reporting N/A.
   required: true
   # Report branch coverage (BRDA records) in addition to line coverage.
