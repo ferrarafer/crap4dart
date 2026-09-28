@@ -68,6 +68,7 @@ class ComplexityGate implements Gate {
           line: info.startLine,
           message: '${info.className}.${info.methodName} '
               'CC=$complexity > max $maxComplexity',
+          measure: complexity,
         ),
       );
     }

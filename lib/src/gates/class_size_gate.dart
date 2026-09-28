@@ -81,6 +81,7 @@ class ClassSizeGate implements Gate {
             line: line,
             message: '${entry.key} has ${classTotals.methods} methods '
                 '> max ${config.maxMethods}',
+            measure: classTotals.methods,
           ),
         );
       }
@@ -91,6 +92,7 @@ class ClassSizeGate implements Gate {
             line: line,
             message: '${entry.key} WMC=${classTotals.wmc} '
                 '> max ${config.maxWmc}',
+            measure: classTotals.wmc,
           ),
         );
       }

@@ -63,6 +63,7 @@ class NestingGate implements Gate {
       line: info.startLine,
       message: '${info.className}.${info.methodName} '
           'nesting=${visitor.maxDepth} > max $maxNesting',
+      measure: visitor.maxDepth,
     );
   }
 }

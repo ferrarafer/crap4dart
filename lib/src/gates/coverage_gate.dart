@@ -46,6 +46,8 @@ class CoverageGate implements Gate {
         file: config.dirs.join(', '),
         message:
             'total coverage ${_fmt(percent)}% < min ${_fmt(config.minPercent)}%',
+        // Uncovered share: grows as coverage drops.
+        measure: 100 - percent,
       ),
     ];
     if (config.perFile) {
@@ -69,6 +71,7 @@ class CoverageGate implements Gate {
               file: file.path,
               message:
                   'coverage ${_fmt(_percent(file))}% < min ${_fmt(minPercent)}%',
+              measure: 100 - _percent(file),
             ),
       ];
 

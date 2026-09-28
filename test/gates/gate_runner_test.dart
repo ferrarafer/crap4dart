@@ -69,4 +69,10 @@ gates:
     // public_docs (missing dartdoc) and unused_files (never imported).
     expect(result.failedCount, 2);
   });
+
+  test('runs each built-in gate exactly once', () {
+    final ids = [for (final gate in GateRunner.defaultGates()) gate.id];
+    expect(ids.toSet(), hasLength(ids.length), reason: 'duplicate gate ids');
+    expect(ids, hasLength(21));
+  });
 }

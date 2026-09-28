@@ -3,7 +3,12 @@ import 'gate_context.dart';
 /// A single violation reported by a quality gate.
 class GateViolation {
   /// Creates a [GateViolation].
-  const GateViolation({required this.file, this.line, required this.message});
+  const GateViolation({
+    required this.file,
+    this.line,
+    required this.message,
+    this.measure,
+  });
 
   /// File the violation belongs to (may be a non-Dart artifact path).
   final String file;
@@ -13,6 +18,12 @@ class GateViolation {
 
   /// Human readable description of the violation.
   final String message;
+
+  /// The measured quantity that makes this a violation (lines, CC,
+  /// duplicated %, uncovered %, ...), oriented so that a larger value is
+  /// worse; `null` for pass/fail violations. Baseline mode accepts an
+  /// existing violation only while its measure does not grow.
+  final num? measure;
 
   @override
   String toString() =>

@@ -82,6 +82,7 @@ class _WeightVisitor extends RecursiveAstVisitor<void> {
             message: '${node.name.lexeme} exposes $fields public fields '
                 'of $members public members '
                 '(weight=${(fields / members).toStringAsFixed(2)})',
+            measure: fields / members,
           ),
         ),
       );

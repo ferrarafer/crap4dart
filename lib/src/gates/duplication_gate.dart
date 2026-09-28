@@ -165,6 +165,7 @@ class DuplicationGate implements Gate {
       line: firstLine,
       message: '${percent.toStringAsFixed(2)}% duplicated lines > '
           '${config.threshold}%',
+      measure: percent,
     );
   }
 

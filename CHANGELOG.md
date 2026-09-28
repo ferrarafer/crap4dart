@@ -22,6 +22,18 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Baseline: violations were keyed by line number, so any edit above a
+  baselined violation (even one blank line) turned it into a "new"
+  violation, and measured messages (`1856 lines`, `8.98% duplicated`,
+  `coverage 53.0%`) stopped matching as soon as the number moved — even
+  when it improved. Baselines now match on gate + file + message shape
+  (numbers masked) with per-key counts, and measured violations carry a
+  `measure` ceiling: they stay covered while they shrink and fail once
+  they grow. `.crap-baseline.json` is now version 2 (no `line`, optional
+  `measure`); version 1 files still load.
+- `GateRunner` registered `broken_goldens`, `test_assertions`,
+  `folder_structure` and `external` twice, so they ran (and reported)
+  twice — 25 gate results for 21 gates.
 - `analyze --lcov <file>` no longer re-runs the test suite first.
   Because `coverage.run_tests` defaults to `true`, an explicit coverage
   file was silently replaced by a fresh (possibly very long) test run.

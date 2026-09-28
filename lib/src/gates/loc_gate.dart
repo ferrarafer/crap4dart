@@ -35,6 +35,7 @@ class LocGate implements Gate {
           GateViolation(
             file: relative,
             message: '$lines lines > max $maxLines',
+            measure: lines,
           ),
         );
       }

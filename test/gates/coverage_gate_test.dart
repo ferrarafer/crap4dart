@@ -78,5 +78,7 @@ void main() {
     expect(result.violations[0].message, contains('total coverage'));
     expect(result.violations[1].file, 'lib/a.dart');
     expect(result.violations[1].message, contains('25.0%'));
+    // Baseline measure is the uncovered share: larger means worse.
+    expect(result.violations[1].measure, 75.0);
   });
 }

@@ -677,12 +677,23 @@ the widget's file. The gate fails when coverage is below
 ## 12. Baseline
 
 `check --save-baseline` shall run all enabled gates and write every
-current violation to `.crap-baseline.json` keyed by gate id, file,
-line and message; the command exits 0. `check --baseline` shall strip
-violations covered by the baseline file before deciding the run
-outcome: a gate fails only when it has at least one violation not in
-the baseline. A missing baseline file is not an error and leaves the
-run unchanged.
+current violation to `.crap-baseline.json` (version 2) as gate id,
+file, message and, for measured violations, `measure` — the value that
+makes it a violation, oriented so larger is worse (lines, CC,
+parameters, nesting depth, methods/WMC, duplicated %, uncovered %,
+literal repeats, loose files, public-field weight). The command exits 0.
+
+`check --baseline` shall strip violations covered by the baseline file
+before deciding the run outcome: a gate fails only when it has at least
+one violation not covered. Matching shall use gate id, file and the
+message with every number replaced by `#`; line numbers shall not be
+used. Matching is one-to-one: each stored entry covers at most one
+current violation. A stored entry covers a current violation of the same
+key only when the current measure does not exceed the stored one (an
+entry or violation without a measure matches any value); entries are
+paired largest measure first. Version 1 files (with `line`) shall load
+with the line ignored. A missing or malformed baseline file is not an
+error and leaves the run unchanged.
 
 ## 13. Threshold
 

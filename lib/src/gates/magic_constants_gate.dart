@@ -75,6 +75,7 @@ class MagicConstantsGate implements Gate {
             line: occurrence.line,
             message: 'literal ${entry.key} repeats '
                 '${occurrences.length} times — extract a named constant',
+            measure: occurrences.length,
           ),
         );
       }

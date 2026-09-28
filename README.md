@@ -540,8 +540,14 @@ crap4dart check --save-baseline   # record current violations to .crap-baseline.
 crap4dart check --baseline        # pass unless NEW violations appear
 ```
 
-The baseline keys violations by gate + file + line + message; a
-violation only fails the run when it is not covered by the baseline.
+The baseline matches violations by gate + file + message *shape*
+(numbers replaced by `#`) — never by line number, so edits that move
+code around do not resurface old debt. It counts: a file with two
+baselined violations of a shape may keep two, not grow to three. For
+measured violations (lines, CC, params, nesting, class size,
+duplicated %, uncovered %, repeats, ...) the stored value is a ceiling:
+a 1856-line file may shrink but fails again once it grows past 1856.
+A violation only fails the run when it is not covered by the baseline.
 Re-run `--save-baseline` after cleanup to ratchet it down.
 
 ## Pre-commit hook

@@ -132,6 +132,7 @@ class _SizeVisitor extends RecursiveAstVisitor<void> {
           file: _file,
           line: startLine,
           message: '$name has $lines lines > max $_maxLines',
+          measure: lines,
         ),
       );
     }
@@ -150,6 +151,7 @@ class _SizeVisitor extends RecursiveAstVisitor<void> {
           file: _file,
           line: _startLine(node),
           message: '$name has $count params > max $_maxParams',
+          measure: count,
         ),
       );
     }

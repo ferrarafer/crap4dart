@@ -36,6 +36,7 @@ class FolderStructureGate implements Gate {
             message: '${entry.value} loose .dart files directly in '
                 '${entry.key} — group them into feature packages '
                 '(max ${config.maxLooseFiles})',
+            measure: entry.value,
           ),
         );
       }
