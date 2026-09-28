@@ -2,7 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.10.0
+
+Fork release (ferrarafer/crap4dart). Minor bump: `.crap-baseline.json`
+is now version 2 (version 1 files still load).
 
 ### Added
 
