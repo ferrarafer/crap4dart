@@ -703,6 +703,20 @@ paired largest measure first. Version 1 files (with `line`) shall load
 with the line ignored. A missing or malformed baseline file is not an
 error and leaves the run unchanged.
 
+`check --tighten-baseline` shall rewrite an existing baseline from a full
+run without accepting anything new: for every gate that ran, each
+covered violation keeps one entry at its current measure (so ceilings
+only go down), stored entries of a key that still has uncovered
+violations (grown past their ceiling) are kept at their stored measure,
+and all other entries of that gate are dropped; uncovered violations are
+never added. Entries of gates that did not run (disabled, skipped or
+filtered by `--only`/`--skip`) are kept unchanged. The command shall
+report kept, lowered and removed entries and the number of violations
+not accepted on stderr, then behave like `check --baseline` with the new
+file. Without a baseline file, or with a partial selection (`--changed`,
+`--staged`, `--diff`, `--diff-base` or explicit paths), it shall exit
+with usage-error status without writing.
+
 ## 13. Threshold
 
 The default CRAP threshold shall be `8.0`, overridable in the config and

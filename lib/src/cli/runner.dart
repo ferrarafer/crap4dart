@@ -21,6 +21,7 @@ import '../hooks/hook_installer.dart';
 import '../profile/profile_runner.dart';
 import '../report/badge_svg.dart';
 import '../report/json_reporter.dart';
+import 'baseline_mode.dart';
 import 'exit_codes.dart';
 import 'goldens_command.dart';
 import 'profile_command.dart';
@@ -51,7 +52,7 @@ Future<String> gitTopLevel(String dir) async {
 }
 
 /// Current crap4dart version.
-const String crap4dartVersion = '0.11.0';
+const String crap4dartVersion = '0.12.0';
 
 /// Shared CLI flag names used by multiple commands.
 const String _configFlag = 'config';
@@ -70,6 +71,7 @@ const String _jsonFormat = 'json';
 /// Option names used by a single command family.
 const String _thresholdFlagName = 'threshold';
 const String _lcovFlag = 'lcov';
+const String _tightenBaselineFlag = 'tighten-baseline';
 const String _configHelp = 'Path to a crap4dart.yaml config file.';
 
 /// Command-line entry point of crap4dart.
@@ -596,6 +598,13 @@ class CheckCommand extends Command<int> with CommandHelpers {
         'baseline',
         negatable: false,
         help: 'Fail only on violations not recorded in the baseline file.',
+      )
+      ..addFlag(
+        _tightenBaselineFlag,
+        negatable: false,
+        help: 'Lower the baseline to the current violations (drop fixed '
+            'ones, shrink measures, never add new ones), then check '
+            'against it like --baseline. Needs a full run.',
       );
   }
 
@@ -626,6 +635,14 @@ class CheckCommand extends Command<int> with CommandHelpers {
       config: config,
     );
     if (prepared.exitCode != null) return prepared.exitCode!;
+    final baselineMode = BaselineMode.fromFlags(
+      save: argResults!['save-baseline'] as bool,
+      apply: argResults!['baseline'] as bool,
+      tighten: argResults![_tightenBaselineFlag] as bool,
+    );
+    if (!baselineMode.validate(partialSelection: prepared.partialSelection)) {
+      return ExitCodes.usageError;
+    }
     final files = prepared.files!;
     if (!await _runTestsIfRequested(projectRoot, config)) {
       return ExitCodes.usageError;
@@ -638,30 +655,13 @@ class CheckCommand extends Command<int> with CommandHelpers {
       partialSelection: prepared.partialSelection,
     );
     final runner = GateRunner();
-    var result = await runner.run(
-      context,
-      only: only,
-      skip: skip,
-      diff: prepared.diffMap,
+    final result = baselineMode.process(
+      projectRoot,
+      await runner.run(context, only: only, skip: skip, diff: prepared.diffMap),
     );
-    if (argResults!['save-baseline'] as bool) {
-      final count = writeBaseline(projectRoot, result.results);
-      stderr.writeln(
-        'Baseline saved: $count violation(s) recorded in '
-        '$baselineFileName',
-      );
-      _printResult(runner, result);
-      return ExitCodes.success;
-    }
-    if (argResults!['baseline'] as bool) {
-      final baseline = Baseline.load(projectRoot);
-      result = GateRunResult([
-        for (final gateResult in result.results)
-          applyBaseline(gateResult.gateId, gateResult, baseline),
-      ], diffMode: result.diffMode);
-    }
+    if (result == null) return ExitCodes.usageError;
     _printResult(runner, result);
-    return result.passed ? ExitCodes.success : ExitCodes.thresholdExceeded;
+    return baselineMode.exitCode(result);
   }
 
   void _printResult(GateRunner runner, GateRunResult result) {

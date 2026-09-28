@@ -540,8 +540,9 @@ violations. Instead of lowering thresholds, record them once and fail
 only on new ones:
 
 ```sh
-crap4dart check --save-baseline   # record current violations to .crap-baseline.json
-crap4dart check --baseline        # pass unless NEW violations appear
+crap4dart check --save-baseline     # record current violations to .crap-baseline.json
+crap4dart check --baseline          # pass unless NEW violations appear
+crap4dart check --tighten-baseline  # ratchet down after cleanup, then check
 ```
 
 The baseline matches violations by gate + file + message *shape*
@@ -552,7 +553,14 @@ measured violations (lines, CC, params, nesting, class size,
 duplicated %, uncovered %, repeats, ...) the stored value is a ceiling:
 a 1856-line file may shrink but fails again once it grows past 1856.
 A violation only fails the run when it is not covered by the baseline.
-Re-run `--save-baseline` after cleanup to ratchet it down.
+
+After paying debt down, lock the progress in with `--tighten-baseline`
+rather than re-saving: it lowers each ceiling to the current value and
+drops fixed entries, but **never adds** new violations (re-saving would
+silently accept whatever is failing at that moment). A violation that
+grew keeps its old ceiling, so fixing it back is covered again. Entries
+of gates that did not run are kept. It needs a full run (no `--changed`,
+`--staged`, `--diff` or paths) and then checks like `--baseline`.
 
 ## Pre-commit hook
 

@@ -19,7 +19,7 @@ Guidance for AI agents and contributors working on crap4dart.
 3. **Gate framework** — per-gate `severity: error|warning`, opt-in
    `ignorable` (ignore comments are OFF by default), per-path
    thresholds (`entries`), baseline mode
-   (`check --save-baseline` / `--baseline`).
+   (`check --save-baseline` / `--baseline` / `--tighten-baseline`).
 4. **Integrations** — `init` (config scaffold), `install` (git hooks +
    GitHub Actions workflow), JSON output, diff mode (`--diff`/`--diff-base`).
 5. **CPU profiling** (`profile`) — instruments every method in `lib/` with

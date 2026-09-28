@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.12.0
+
+### Added
+
+- `check --tighten-baseline`: ratchets `.crap-baseline.json` down from a
+  full run — ceilings drop to current measures, fixed entries are
+  removed, new violations are never added (unlike re-running
+  `--save-baseline`), grown violations keep their old ceiling, and
+  entries of gates that did not run are untouched. Then checks like
+  `--baseline`. Refuses partial selections.
+
 ## 0.11.0
 
 ### Changed
