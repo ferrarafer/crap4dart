@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.10.2
+
+### Fixed
+
+- `--diff` / `--diff-base` found nothing when the project is a
+  subdirectory of its git repository (monorepo package): `git diff`
+  printed repository-root paths (`app/lib/...`) that never matched the
+  project-relative sources. It now runs `git diff --relative`.
+
 ## 0.10.1
 
 ### Fixed

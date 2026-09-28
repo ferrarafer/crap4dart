@@ -54,13 +54,16 @@ class GitDiffParser {
   /// Creates a [GitDiffParser].
   const GitDiffParser();
 
-  /// Runs `git diff --unified=0 <base> -- '*.dart'` in [projectRoot] and
-  /// parses the result. Throws a [ProcessException] when git fails (e.g.
-  /// not a git repository or an unknown ref).
+  /// Runs `git diff --relative --unified=0 <base> -- '*.dart'` in
+  /// [projectRoot] and parses the result. `--relative` makes paths
+  /// project-relative (and limits the diff to the project) when the
+  /// project is a subdirectory of the repository, e.g. a monorepo package.
+  /// Throws a [ProcessException] when git fails (e.g. not a git
+  /// repository or an unknown ref).
   Future<DiffLineMap> diff(String projectRoot, {String base = 'HEAD'}) async {
     final result = await Process.run(
       'git',
-      ['diff', '--unified=0', base, '--', '*.dart'],
+      ['diff', '--relative', '--unified=0', base, '--', '*.dart'],
       workingDirectory: projectRoot,
     );
     if (result.exitCode != 0) {

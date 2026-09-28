@@ -53,6 +53,23 @@ void main() {
       expect(result.stdout, contains('addedMethod'));
     });
 
+    test('works for a project in a git subdirectory (monorepo)', () async {
+      // git reports repo-root paths (pkg/lib/...); the project is pkg/.
+      final pkg = Directory(p.join(tempDir.path, 'pkg'))..createSync();
+      writeCleanProject(pkg);
+      final file = p.join(pkg.path, 'lib', 'legacy.dart');
+      File(file).writeAsStringSync('int oldMethod() => 0;\n');
+      await gitInitAndCommit(tempDir, 'base');
+      File(file).writeAsStringSync(
+        'int addedMethod() => 1;\n',
+        mode: FileMode.append,
+      );
+      final result = await runCliInProcess(pkg, ['analyze', '--diff']);
+      expect(result.exitCode, 0);
+      expect(result.stdout, contains('addedMethod'));
+      expect(result.stdout, isNot(contains('oldMethod')));
+    });
+
     test('git failure exits 1', () async {
       writeCleanProject(tempDir); // not a git repo
       final result = await runCliInProcess(tempDir, ['analyze', '--diff']);
