@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.12.3
+
+### Fixed
+
+- `unused_files` reported files as never imported when their only
+  importer was excluded by the top-level `exclude`. Excluding generated
+  code (e.g. a Stacked `app.router.dart` / `app.locator.dart`) orphaned
+  every view and service it wires together. Imports are now read from
+  every file in `sources`; excluded files are still never reported.
+
 ## 0.12.2
 
 ### Fixed

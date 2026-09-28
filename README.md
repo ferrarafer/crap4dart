@@ -366,6 +366,8 @@ and `check` in their default (all-files) mode — default `[lib, bin]`. Set
 The top-level `exclude` key (default `[]`) drops files matching the given
 glob patterns (matched project-relative) in every selection mode —
 default discovery, `--changed`, `--staged`, `--diff` and explicit paths.
+Excluded files are neither analyzed nor reported, but `unused_files`
+still reads their imports.
 
 `crap.count_lambdas` and `gates.complexity.count_lambdas` (both default
 `true`, independently) control whether branches inside lambdas count
@@ -525,8 +527,10 @@ gates:
   code is a typical leftover of AI-assisted refactoring. References are
   counted on unresolved ASTs (lexical identifiers).
 - **unused_files** — flags files under `dirs` (default `[lib]`) that are
-  never imported by any analyzed file. Files with a `main()` and
-  `part of` files are never reported.
+  never imported by any file in `sources`. Files with a `main()` and
+  `part of` files are never reported. Imports from files the top-level
+  `exclude` drops still count, so excluding generated code (a router, a
+  service locator) doesn't orphan the files it wires together.
 - **banned_imports** — enforces architectural boundaries with rules of
   `{from, forbid, message}`: imports matching a `forbid` glob are banned
   in files matching `from` (e.g. `lib/ui/**` must not import

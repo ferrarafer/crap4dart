@@ -1,5 +1,7 @@
+import 'package:crap4dart/src/gates/gate_context.dart';
 import 'package:crap4dart/src/gates/unused_code_gate.dart';
 import 'package:crap4dart/src/gates/unused_files_gate.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import 'gate_test_utils.dart';
@@ -49,5 +51,28 @@ void caller() => _aliveFunction();
     );
     expect(result.passed, isFalse);
     expect(result.violations.single.file, 'lib/orphan.dart');
+  });
+
+  test('unused_files reads imports from referenceFiles only', () async {
+    final project = createTempProject();
+    addTearDown(() => project.deleteSync(recursive: true));
+    writeFile(project, 'pubspec.yaml', 'name: myapp\n');
+    writeFile(project, 'lib/screen.dart', 'void s() {}\n');
+    writeFile(project, 'lib/router.dart', "import 'screen.dart';\n");
+    final analyzed = makeContext(project, ['lib/screen.dart']);
+    final result = await UnusedFilesGate().run(
+      GateContext(
+        projectRoot: analyzed.projectRoot,
+        config: analyzed.config,
+        files: analyzed.files,
+        referenceFiles: [
+          ...analyzed.files,
+          p.join(project.path, 'lib/router.dart'),
+        ],
+      ),
+    );
+    // screen.dart is imported by the reference-only router, and the
+    // router itself is never a candidate because it is not analyzed.
+    expect(result.passed, isTrue);
   });
 }

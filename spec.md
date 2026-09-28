@@ -541,7 +541,10 @@ entirely — both their declarations and their references.
 ### 11.9 unused_files
 
 Flags files under `dirs` (default `lib`) that are never imported by any
-analyzed file. A file containing a top-level `main` function and
+file in `sources`. Files dropped by the top-level `exclude` are never
+reported, but their imports still count, so a file imported only by
+excluded generated code (a router, a service locator) is used. A file
+containing a top-level `main` function and
 `part of` files are never reported. Imports resolve to project-relative
 paths: relative URIs against the importing file's directory,
 `package:<self>/...` against `lib/`; external packages never count.

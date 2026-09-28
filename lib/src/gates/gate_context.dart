@@ -7,6 +7,7 @@ import '../analysis/dart_parser.dart';
 import '../config/config.dart';
 import '../coverage/lcov_parser.dart';
 import '../files/flutter_project.dart' as files_flutter;
+import '../files/source_finder.dart';
 
 /// Shared input for all quality gates: project root, config, target files,
 /// optional coverage data and a memoized AST cache.
@@ -18,7 +19,8 @@ class GateContext {
     required this.files,
     this.lcov,
     this.partialSelection = false,
-  });
+    List<String>? referenceFiles,
+  }) : _referenceFiles = referenceFiles;
 
   /// Absolute path of the project root.
   final String projectRoot;
@@ -37,6 +39,20 @@ class GateContext {
   /// (unused_code, unused_files) skip themselves in partial runs: their
   /// verdicts need every file's imports and references.
   final bool partialSelection;
+
+  List<String>? _referenceFiles;
+
+  /// Every file in the configured `sources`, including those the top-level
+  /// `exclude` drops from [files]; just [files] for a partial selection.
+  /// Whole-project gates read references from this set: generated code such
+  /// as a router is excluded from analysis, but its imports still make a
+  /// file used. Scanned on first access unless passed to the constructor.
+  List<String> get referenceFiles => _referenceFiles ??= partialSelection
+      ? files
+      : const SourceFinder().findDefaultSources(
+          projectRoot,
+          roots: config.sources,
+        );
 
   final Map<String, ParsedUnit> _astCache = {};
   final Map<String, List<String>> _linesCache = {};

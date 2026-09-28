@@ -26,14 +26,12 @@ class UnusedFilesGate implements Gate {
       );
     }
     final config = context.config.gates.unusedFiles;
-    final imported = <String>{};
+    final imported = _importedByReferenceFiles(context, config.exclude);
     final candidates = <String>[];
     for (final file in context.files) {
       final relative = context.relativePath(file);
       if (context.matchesAnyGlob(file, config.exclude)) continue;
-      final parsed = context.parsed(file);
-      imported.addAll(_importedTargets(parsed, relative, context));
-      if (_isCandidate(parsed, relative, config.dirs, context)) {
+      if (_isCandidate(context.parsed(file), relative, config.dirs, context)) {
         candidates.add(relative);
       }
     }
@@ -49,6 +47,28 @@ class UnusedFilesGate implements Gate {
     return violations.isEmpty
         ? GateResult.pass(id, summary: summary)
         : GateResult.fail(id, violations, summary: summary);
+  }
+
+  /// Project-relative paths imported or exported by any reference file
+  /// (see [GateContext.referenceFiles]) not matching the gate's [exclude].
+  /// Files the top-level `exclude` hides are still read here, so a file
+  /// imported only by generated code is not reported as unused.
+  Set<String> _importedByReferenceFiles(
+    GateContext context,
+    List<String> exclude,
+  ) {
+    final imported = <String>{};
+    for (final file in context.referenceFiles) {
+      if (context.matchesAnyGlob(file, exclude)) continue;
+      imported.addAll(
+        _importedTargets(
+          context.parsed(file),
+          context.relativePath(file),
+          context,
+        ),
+      );
+    }
+    return imported;
   }
 
   /// Project-relative paths imported or exported by [relative]'s unit.
