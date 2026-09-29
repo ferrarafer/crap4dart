@@ -1,5 +1,12 @@
 # crap4dart
 
+> **This repository is archived.** crap4dart continues as
+> **[crap_dart](https://github.com/ferrarafer/crap_dart)**: same code
+> and history, command `crap_dart`, config `crap_dart.yaml` (the old
+> `crap4dart.yaml` is still read). Existing tags here keep working for
+> `--git-ref` installs. See
+> [Migrating from crap4dart](https://github.com/ferrarafer/crap_dart#migrating-from-crap4dart).
+
 CRAP metric analyzer and configurable quality gates for Dart and Flutter
 projects.
 
